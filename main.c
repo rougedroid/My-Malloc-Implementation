@@ -1,6 +1,7 @@
 #include <sys/mman.h>
 #include <stddef.h>
-
+#include <stdio.h>
+#include <stdint.h>
 
 // INIT with 4 * 16-bytes, 2 * 32-bytes blocks 
 //  int - 4 bytes
@@ -51,6 +52,9 @@ void * my_malloc(size_t rsize) {
   block_header_t *nblock;
   block_header_t *cblock = firstheader;
   size_t reqsize = 8*((rsize+sizeof(block_header_t)+7) / 8);
+  if ((SIZE_MAX - rsize) < sizeof(block_header_t)){
+    return NULL;
+  }
   for(int i = 0; i<chain_length;i++) {
     if ((*cblock).is_free==1 && (*cblock).size >= rsize){
       if ((*cblock).size  >= (reqsize + (sizeof(block_header_t) + sizeof(1)))) {
@@ -96,3 +100,7 @@ void my_free(void *ptr) {
     }
   }
 }
+/*
+int main(){
+  init();
+} */
